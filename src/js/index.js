@@ -32,6 +32,7 @@ const controlSearch = async () => {
         // 6) Render results on the UI
         searchView.renderResults(state.search.result);
 
+
     }
 
 }
@@ -39,5 +40,15 @@ const controlSearch = async () => {
 elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
     controlSearch();
+})
+
+elements.searchPagination.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-inline');
+    if (btn) {
+        const gotoPage = parseInt(btn.dataset.goto, 10);
+        searchView.clearResults();
+        searchView.clearButtons();
+        searchView.renderResults(state.search.result, gotoPage);
+    }
 })
 
