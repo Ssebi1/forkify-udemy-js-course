@@ -1,4 +1,5 @@
 import Search from './models/Search';
+import Recipe from './models/Recipe';
 import * as searchView from './views/SearchView';
 import { elements, renderLoader, clearLoader } from './views/base';
 
@@ -12,7 +13,9 @@ const state = {};
 
 const controlSearch = async () => {
     // 1) Get the query from the view
-    const query = searchView.getInput();
+    //const query = searchView.getInput();
+    const query = 'pizza';
+
 
     if (query) {
         // 2) New search object and add to state
@@ -23,15 +26,19 @@ const controlSearch = async () => {
         searchView.clearInput();
         renderLoader(elements.searchResults);
 
-        // 4) Search for recipes
-        await state.search.getResult();
+        try {
+            // 4) Search for recipes
+            await state.search.getResult();
 
-        // 5) Remove loader
-        clearLoader();
+            // 5) Remove loader
+            clearLoader();
 
-        // 6) Render results on the UI
-        searchView.renderResults(state.search.result);
-
+            // 6) Render results on the UI
+            searchView.renderResults(state.search.result);
+        } catch (err) {
+            console.log(err);
+            clearLoader();
+        }
 
     }
 
@@ -39,6 +46,11 @@ const controlSearch = async () => {
 
 elements.searchForm.addEventListener('submit', e => {
     e.preventDefault();
+    controlSearch();
+})
+
+//Testing
+window.addEventListener('load', e => {
     controlSearch();
 })
 
@@ -52,3 +64,31 @@ elements.searchPagination.addEventListener('click', e => {
     }
 })
 
+const controlRecipe = async () => {
+    //Get id from url
+    const id = window.location.hash.replace('#', '');
+
+    if (id) {
+        //Prepare ui for changes
+
+        //Create new recipe object
+        state.recipe = new Recipe(id);
+
+        try {
+            //Get recipe data
+            await state.recipe.getRecipe();
+
+            //Calculate serving and time
+            state.recipe.calcServing();
+            state.recipe.calcTime();
+
+            //Render recipe
+            state.recipe.parseIngredients();
+            console.log(state.recipe);
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
+};
+['hashchange', 'load'].forEach(event => window.addEventListener(event, controlRecipe));
