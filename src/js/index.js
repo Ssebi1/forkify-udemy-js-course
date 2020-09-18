@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/SearchView';
+import * as recipeView from './views/recipeView';
 import { elements, renderLoader, clearLoader } from './views/base';
 
 // Global state of the app
@@ -13,9 +14,7 @@ const state = {};
 
 const controlSearch = async () => {
     // 1) Get the query from the view
-    //const query = searchView.getInput();
-    const query = 'pizza';
-
+    const query = searchView.getInput();
 
     if (query) {
         // 2) New search object and add to state
@@ -49,10 +48,6 @@ elements.searchForm.addEventListener('submit', e => {
     controlSearch();
 })
 
-//Testing
-window.addEventListener('load', e => {
-    controlSearch();
-})
 
 elements.searchPagination.addEventListener('click', e => {
     const btn = e.target.closest('.btn-inline');
@@ -70,21 +65,28 @@ const controlRecipe = async () => {
 
     if (id) {
         //Prepare ui for changes
+        recipeView.clearRecipe();
+        renderLoader(elements.recipe);
+
+        //Highlight selected search item
+        if (state.search)
+            searchView.highlightSelected(id);
 
         //Create new recipe object
         state.recipe = new Recipe(id);
 
         try {
-            //Get recipe data
+            //Get recipe data and parse ingredients
             await state.recipe.getRecipe();
+            state.recipe.parseIngredients();
 
             //Calculate serving and time
             state.recipe.calcServing();
             state.recipe.calcTime();
 
             //Render recipe
-            state.recipe.parseIngredients();
-            console.log(state.recipe);
+            clearLoader();
+            recipeView.renderRecipe(state.recipe);
 
         } catch (err) {
             console.log(err);

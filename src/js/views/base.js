@@ -3,7 +3,8 @@ export const elements = {
     searchInput: document.querySelector('.search__field'),
     searchResults: document.querySelector('.results'),
     searchResultsList: document.querySelector('.results__list'),
-    searchPagination: document.querySelector('.results__pages')
+    searchPagination: document.querySelector('.results__pages'),
+    recipe: document.querySelector('.recipe')
 }
 
 export const renderLoader = (parent) => {
