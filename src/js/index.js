@@ -4,7 +4,9 @@ import List from './models/List';
 import * as searchView from './views/SearchView';
 import * as recipeView from './views/recipeView';
 import * as listView from './views/listView';
+import * as likesView from './views/likesView';
 import { elements, renderLoader, clearLoader } from './views/base';
+import Likes from './models/Likes';
 
 
 // Global state of the app
@@ -78,6 +80,8 @@ const controlRecipe = async () => {
         //Create new recipe object
         state.recipe = new Recipe(id);
 
+
+
         try {
             //Get recipe data and parse ingredients
             await state.recipe.getRecipe();
@@ -89,7 +93,8 @@ const controlRecipe = async () => {
 
             //Render recipe
             clearLoader();
-            recipeView.renderRecipe(state.recipe);
+            recipeView.renderRecipe(state.recipe, state.likes.isLiked(id));
+
 
         } catch (err) {
             console.log(err);
@@ -124,8 +129,51 @@ elements.recipe.addEventListener('click', e => {
         recipeView.updateServingsIngredients(state.recipe);
     } else if (e.target.matches('.recipe__btn-add, .recipe__btn-add *')) {
         controlList();
+    } else if (e.target.matches('.recipe__love, .recipe__love *')) {
+        controlLike();
     }
 })
+
+//Testing
+state.likes = new Likes();
+likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+const controlLike = () => {
+
+
+    if (!state.likes)
+        state.likes = new Likes();
+
+    const currentId = state.recipe.id;
+    if (!state.likes.isLiked(currentId)) {
+        //Add like to the state
+        const newLike = state.likes.addLike(currentId, state.recipe.title, state.recipe.author, state.recipe.img);
+
+        //Toggle the like button
+        likesView.toggleLikebtn(true);
+        likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+        //Add like to UI list
+        likesView.renderLike(newLike);
+
+    } else {
+        //Remove like from the state
+        state.likes.deleteLike(currentId);
+
+        //Toggle the like button
+        likesView.toggleLikebtn(false);
+        likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+        //remove like from UI list
+        likesView.deleteLike(currentId);
+    }
+
+
+
+}
+
+
+
 
 
 //Handle delete and update list item events
@@ -139,9 +187,12 @@ elements.shopping.addEventListener('click', e => {
 
         //Delete from UI
         listView.deleteItem(id);
+
     } else if (e.target.matches('.shopping__count-value')) {
         const val = parseFloat(e.target.value, 10);
         state.list.updateCount(id, val);
     }
 
 })
+
+
