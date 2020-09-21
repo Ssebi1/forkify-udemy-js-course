@@ -569,12 +569,13 @@ body {
   padding: 3rem 4rem;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .shopping__list {
   list-style: none;
   max-height: 77rem;
-  overflow: scroll;
+  overflow: auto;
 }
 
 .shopping__item {
@@ -602,7 +603,7 @@ body {
   font-size: 1.2rem;
   text-align: center;
   border: none;
-  width: 3.7rem;
+  width: 4rem;
   border-radius: 3px;
 }
 
