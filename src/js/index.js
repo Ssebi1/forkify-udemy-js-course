@@ -135,14 +135,17 @@ elements.recipe.addEventListener('click', e => {
 })
 
 //Testing
-state.likes = new Likes();
-likesView.toggleLikeMenu(state.likes.getNumLikes());
+
+
+// Restore liked recipes on page load
+window.addEventListener('load', () => {
+    state.likes = new Likes();
+    state.likes.readStorage();
+    likesView.toggleLikeMenu(state.likes.getNumLikes());
+    state.likes.likes.forEach(like => likesView.renderLike(like));
+})
 
 const controlLike = () => {
-
-
-    if (!state.likes)
-        state.likes = new Likes();
 
     const currentId = state.recipe.id;
     if (!state.likes.isLiked(currentId)) {
